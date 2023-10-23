@@ -3,7 +3,7 @@ package Entity;
 import java.io.Serializable;
 
 public class Player implements Serializable {
-    private int id;
+    private Integer id;
     private Vector2f pos;
     private Vector2f rot;
     private String clientName;
@@ -22,6 +22,18 @@ public class Player implements Serializable {
         this.pos = player.getPos();
         this.rot = player.getRot();
         this.clientName = clientName;
+    }
+
+    public Player(Integer id, String clientName, Player player){
+        this.pos = player.getPos();
+        this.rot = player.getRot();
+        this.clientName = clientName;
+    }
+
+    public Player(Integer id, Player player){
+        this.pos = player.getPos();
+        this.rot = player.getRot();
+        this.id = id;
     }
 
     public Player(String clientName, Vector2f pos, Vector2f rot){

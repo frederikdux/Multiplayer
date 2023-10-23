@@ -5,8 +5,10 @@ import Entity.Vector2f;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Optional;
 
 public class GameInformation implements Serializable {
+    private ArrayList<Player> players = new ArrayList<Player>();
     private HashMap<Integer, Vector2f> playerPositions;
     private HashMap<Integer, Vector2f> playerRotations;
 
@@ -15,12 +17,34 @@ public class GameInformation implements Serializable {
         this.playerRotations = playerRotations;
     }
     public GameInformation(){
-
+        playerPositions = new HashMap<Integer, Vector2f>();
+        playerRotations = new HashMap<Integer, Vector2f>();
     }
 
-    public void addInformation(Player player){
-
+    public GameInformation(ArrayList<Player> players){
+        this.players = players;
     }
+
+
+
+
+    public void updatePlayer(Integer id, Player player){
+        if(players.stream().noneMatch(player1 -> player1.getId() == id)){
+            players.add(new Player(id, player));
+        }
+        else{
+            players.stream().filter(player1 -> player1.getId() == id).forEach(player1 -> player1.setPos(player.getPos()));
+        }
+    }
+
+
+    public void removePlayer(Integer id){
+        playerPositions.remove(id);
+        playerRotations.remove(id);
+    }
+
+
+
 
     public HashMap<Integer, Vector2f> getPlayerPositions() {
         return playerPositions;
@@ -40,5 +64,12 @@ public class GameInformation implements Serializable {
 
     public void setPlayerRotations(HashMap<Integer, Vector2f> playerRotations) {
         this.playerRotations = playerRotations;
+    }
+
+    public ArrayList<Player> getPlayers() {
+        return players;
+    }
+    public Optional<Player> getPlayerByID(Integer id) {
+        return players.stream().filter(player -> player.getId() == id).findFirst();
     }
 }

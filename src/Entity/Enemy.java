@@ -1,14 +1,25 @@
 package Entity;
 
 public class Enemy {
+    public Integer id;
     private Vector2f pos;
     private Vector2f rot;
     private String clientName;
 
-    public Enemy(String clientName, Vector2f pos, Vector2f rot) {
+    public Enemy(int id, String clientName, Vector2f pos, Vector2f rot) {
         this.pos = pos;
         this.rot = rot;
         this.clientName = clientName;
+    }
+    public Enemy(Integer id, Vector2f pos, Vector2f rot){
+        this.id = id;
+        this.pos = pos;
+        this.rot = rot;
+    }
+    public Enemy(Integer id, String clientName, Vector2f pos, Vector2f rot){
+        this.id = id;
+        this.pos = pos;
+        this.rot = rot;
     }
 
     public Vector2f getPos() {

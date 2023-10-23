@@ -1,8 +1,7 @@
 package Networking;
 
 import Entity.*;
-import com.UI.Game;
-import com.UI.GameManager;
+import UI.GameManager;
 
 import java.io.*;
 import java.net.*;
@@ -10,7 +9,7 @@ import java.util.Scanner;
 
 public class Client {
 
-    private GameInformation receivedGameInformations;
+    public GameInformation receivedGameInformations;
 
     PrintWriter writer;
 
@@ -32,8 +31,7 @@ public class Client {
             String clientName = scanner.nextLine();
 
             output = new ObjectOutputStream(socket.getOutputStream());
-            output.writeObject(new Message("String", new TextMessage(clientName)));
-
+            output.writeObject(new Message("registerNewPlayer", new Player(clientName, manager.player)));
 
 
             // Thread zum Empfangen von Nachrichten vom Server
@@ -42,20 +40,27 @@ public class Client {
                     ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
                     Message message;
                     while ((message = (Message) in.readObject()) != null) {
+
                         if(message.messageType.equals("gameInformation")){
                             receivedGameInformations = (GameInformation) message.message;
-                            System.out.println(receivedGameInformations.getPlayerPositions().get(0));
+                            System.out.println(receivedGameInformations.getPlayers().size());
+                            manager.updateEnemies();
                         }
+
+
+
                         if(message.messageType.equals("playerData")){
                             Player player = (Player) message.message;
-                            if(manager.enemies.stream().noneMatch(enemy -> player.getClientName().equals(enemy.getClientName()))) {
+                            if(manager.enemies.stream().noneMatch(enemy -> player.getId() == enemy.id)) {
+                                System.out.println("Neuer Gegner registriert");
                                 manager.registerNewEnemy(player);
                             }
                             else{
-                                manager.enemies.stream().filter(enemy -> enemy.getClientName().equals(player.getClientName())).forEach(enemy -> enemy.setPos(player.getPos()));
+                                manager.enemies.stream().filter(enemy -> enemy.id == player.getId()).forEach(enemy -> enemy.setPos(player.getPos()));
                             }
-                            //System.out.println(player.getClientName() + ": " + player.getPos().x + " / " + player.getPos().y);
                         }
+
+
                         if(message.messageType.equals("String")){
                             System.out.println(((TextMessage) message.message).text);
                         }

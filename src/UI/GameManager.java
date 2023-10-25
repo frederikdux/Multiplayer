@@ -7,10 +7,19 @@ import Networking.Client;
 import Networking.Server;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.concurrent.TimeUnit;
 
 public class GameManager {
     public Player player;
     public final ArrayList<Enemy> enemies = new ArrayList<Enemy>();
+    public final HashMap<Integer, Vector2f> enemysLastPositions = new HashMap<>();
+    public final HashMap<Integer, Vector2f> enemysVelocity = new HashMap<>();
+
+    Long lastUpdate = 0L;
+    Long newUpdate = 0L;
+    long elapsedTimeMilli = 0;
+
     private Client client;
 
     public GameManager(boolean startAsServer){
@@ -29,17 +38,32 @@ public class GameManager {
 
         });
 
+        Thread gameUpdater = new Thread(() -> {
+
+        });
+
         backend.start();
+        gameUpdater.start();
     }
 
 
 
     public void updateEnemies(){
+        newUpdate = System.nanoTime();
+        elapsedTimeMilli = (newUpdate - lastUpdate)/1000000;
+        float elapsedTime = ((float)elapsedTimeMilli) / 100;
+        System.out.println(elapsedTime);
+
         for (Player newEnemy: client.receivedGameInformations.getPlayers()){
             if(enemies.stream().anyMatch(enemy -> enemy.id == newEnemy.getId())){
                 enemies.stream().forEach(enemy -> {
                     if(enemy.id == newEnemy.getId()){
+                        Vector2f lastPosition = enemysLastPositions.get(enemy.id);
+                        Vector2f velocity = new Vector2f((newEnemy.getPos().x - lastPosition.x) * elapsedTime, (newEnemy.getPos().y - lastPosition.y) * elapsedTime);
+                        enemysVelocity.replace(enemy.id, velocity);
+                        System.out.println("Velocity: " + velocity.x + " " + velocity.y);
                         enemy.setPos(newEnemy.getPos());
+                        enemysLastPositions.replace(enemy.id, enemy.getPos());
                     }
                 });
             }
@@ -50,6 +74,8 @@ public class GameManager {
 
         enemies.removeIf(enemy -> client.receivedGameInformations.getPlayerByID(enemy.id).isEmpty());
     }
+
+
 
     public Client getClient() {
         return client;

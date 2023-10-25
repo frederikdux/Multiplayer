@@ -72,4 +72,8 @@ public class Player implements Serializable {
     public String getClientName() {
         return clientName;
     }
+
+    public void setClientName(String clientName) {
+        this.clientName = clientName;
+    }
 }

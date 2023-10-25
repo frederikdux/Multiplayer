@@ -12,7 +12,6 @@ public class GameManager {
     public Player player;
     public final ArrayList<Enemy> enemies = new ArrayList<Enemy>();
     private Client client;
-    private Game game;
 
     public GameManager(boolean startAsServer){
         this.player = new Player(new Vector2f(50, 50), new Vector2f(0, 0));

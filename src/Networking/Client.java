@@ -20,17 +20,25 @@ public class Client {
 
     GameManager manager;
 
+    String clientName;
+
     public Client(GameManager manager) {
         this.manager = manager;
         try {
-            socket = new Socket("25.37.95.70", 12345);
-            System.out.println("Verbindung zum Server hergestellt.");
+            socket = new Socket("25.37.137.22", 12345);
+
+            if(socket.isConnected()) {
+                System.out.println("Verbindung zum Server hergestellt.");
+            }
+            else{
+                System.out.println("Verbindung fehlgeschlagen!");
+            }
 
             Scanner scanner = new Scanner(System.in);
 
             System.out.print("Gib deinen Namen ein: ");
-            String clientName = scanner.nextLine();
-
+            clientName = scanner.nextLine();
+            manager.player.setClientName(clientName);
             output = new ObjectOutputStream(socket.getOutputStream());
             output.writeObject(new Message("registerNewPlayer", new Player(clientName, manager.player)));
 

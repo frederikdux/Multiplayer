@@ -12,6 +12,7 @@ import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
@@ -38,9 +39,13 @@ public class Game extends JFrame implements KeyListener {
     private Image dbImage;
     private Graphics dbGraphics;
 
-    public GameManager manager;
+    public volatile GameManager manager;
     int testCounter = 0;
     HashSet<Character> pressed = new HashSet<>();
+
+
+    Long start = 0L;
+    Long finish = 0L;
 
 
     public Game(GameManager manager) {
@@ -55,7 +60,12 @@ public class Game extends JFrame implements KeyListener {
             this.addKeyListener(this);
         });
 
+        Thread playerController = new Thread(this::controllPlayer);
+
         frontend.start();
+
+        playerController.start();
+
     }
 
 
@@ -108,18 +118,25 @@ public class Game extends JFrame implements KeyListener {
         controllPlayer();
     }
 
-    public void controllPlayer(){
-        for (Map.Entry<Integer, Boolean> entry : keys.entrySet()){
-            if(entry.getValue()) {
+    public void controllPlayer() {
+
+        start = System.nanoTime();
+        double elapsedTime = ((double) (start - finish) / 1000);
+        elapsedTime = 10;
+        //System.out.println(elapsedTime);
+        for (Map.Entry<Integer, Boolean> entry : keys.entrySet()) {
+            if (entry.getValue()) {
                 switch (entry.getKey()) {
-                    case KeyEvent.VK_W -> manager.player.move(new Vector2f(0, -2));
-                    case KeyEvent.VK_A -> manager.player.move(new Vector2f(-2, 0));
-                    case KeyEvent.VK_S -> manager.player.move(new Vector2f(0, 2));
-                    case KeyEvent.VK_D -> manager.player.move(new Vector2f(2, 0));
+                    case KeyEvent.VK_W -> manager.player.move(new Vector2f(0, (float) (-0.2 * elapsedTime)));
+                    case KeyEvent.VK_A -> manager.player.move(new Vector2f((float) (-0.2 * elapsedTime), 0));
+                    case KeyEvent.VK_S -> manager.player.move(new Vector2f(0, (float) (0.2 * elapsedTime)));
+                    case KeyEvent.VK_D -> manager.player.move(new Vector2f((float) (0.2 * elapsedTime), 0));
                 }
                 manager.getClient().sendPlayerInformation(new Player(new Vector2f(manager.player.getPos().x, manager.player.getPos().y), manager.player.getRot()));
             }
         }
+        finish = System.nanoTime();
+
     }
 
 }

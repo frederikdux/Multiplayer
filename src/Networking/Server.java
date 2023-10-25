@@ -63,26 +63,31 @@ public class Server {
             try {
                 in = new ObjectInputStream(socket.getInputStream());
                 Message message;
-                while ((message = (Message) in.readObject()) != null) {
-                    //System.out.println("received Data of Type: " + message.messageType);
 
-                    switch(message.messageType){
-                        case "gameInformation":
-                            extractGameInformation(message);
-                            break;
-                        case "playerData":
-                            extractPlayerData(message);
-                            break;
-                        case "registerNewPlayer":
-                            extractRegisterNewPlayerRequest(message);
-                            break;
-                        case "Vector2f":
-                            extractVector2f(message);
-                            break;
-                        case "String":
-                            System.out.println(((TextMessage)message.message).text);
-                            break;
+                try {
+                    while ((message = (Message) in.readObject()) != null) {
+                        //System.out.println("received Data of Type: " + message.messageType);
+
+                        switch (message.messageType) {
+                            case "gameInformation":
+                                extractGameInformation(message);
+                                break;
+                            case "playerData":
+                                extractPlayerData(message);
+                                break;
+                            case "registerNewPlayer":
+                                extractRegisterNewPlayerRequest(message);
+                                break;
+                            case "Vector2f":
+                                extractVector2f(message);
+                                break;
+                            case "String":
+                                System.out.println(((TextMessage) message.message).text);
+                                break;
+                        }
                     }
+                }catch(SocketException e){
+                    //logoutUser();
                 }
             } catch (IOException | ClassNotFoundException e) {
                 e.printStackTrace();
@@ -104,7 +109,6 @@ public class Server {
                 System.out.println(clientName + " ist dem Server beigetreten.");
 
                 server.gameInformation.updatePlayer(clientId, newPlayer);
-                System.out.println(clientName + ": name Set!");
                 broadcastTextMessage(clientName + " ist dem Server beigetreten.");
                 broadcastDirectGameInformation(server.gameInformation, out);
 
@@ -139,6 +143,7 @@ public class Server {
             clientNames.remove(out);
             clientIDs.remove(out);
             server.gameInformation.removePlayerByID(clientId);
+            System.out.println(clientName + " hat den Server verlassen.");
             broadcastTextMessage(clientName + " hat den Chat verlassen.");
             broadcastGameInformation(server.gameInformation);
             //broadcastCustom("playerEvent", new Message("playerLeftServer_ID", clientId));

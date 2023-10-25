@@ -35,14 +35,9 @@ public class GameManager {
 
 
     public void updateEnemies(){
-        System.out.println("Received " + client.receivedGameInformations.getPlayers().size() + " player positions!");
-        for(Player newPlayer : client.receivedGameInformations.getPlayers()){
-            System.out.println(newPlayer.getId() + ": " + newPlayer.getPos().x + " " + newPlayer.getPos().y);
-        }
         for (Player newEnemy: client.receivedGameInformations.getPlayers()){
             if(enemies.stream().anyMatch(enemy -> enemy.id == newEnemy.getId())){
                 enemies.stream().forEach(enemy -> {
-                    System.out.println("enemy: " + enemy.id + "  newEnemy: " + newEnemy.getId());
                     if(enemy.id == newEnemy.getId()){
                         enemy.setPos(newEnemy.getPos());
                     }
@@ -51,7 +46,6 @@ public class GameManager {
             else{
                 enemies.add(new Enemy(newEnemy.getId(), newEnemy.getClientName(), newEnemy.getPos(), new Vector2f(0, 0)));
             }
-            enemies.forEach(enemy-> System.out.println(enemy.getClientName()));
         }
 
         enemies.removeIf(enemy -> client.receivedGameInformations.getPlayerByID(enemy.id).isEmpty());

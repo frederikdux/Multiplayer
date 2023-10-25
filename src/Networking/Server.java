@@ -118,23 +118,16 @@ public class Server {
 
         private void extractVector2f(Message message) {
             Vector2f pos = ((Vector2f) message.message);
-            System.out.println(clientName + ": " + pos.x + " / " + pos.y);
         }
 
         private void extractPlayerData(Message message) {
             Player receivedPlayer = ((Player) message.message);
-            System.out.println(clientName + ": " + receivedPlayer.getPos().x + " / " + receivedPlayer.getPos().y);
             server.gameInformation.updatePlayer(clientId, receivedPlayer);
             broadcastPlayerData(new Player(clientId, receivedPlayer));
         }
 
         private void extractGameInformation(Message message) {
             server.gameInformation = (GameInformation) message.message;
-            Vector2f pos;
-            for(int i = 0; i < server.gameInformation.getPlayerPositions().size(); i++){
-                pos = server.gameInformation.getPlayerPositions().get(i);
-                System.out.println(clientName + ": " + pos.x + " / " + pos.y);
-            }
         }
 
 
@@ -207,10 +200,10 @@ public class Server {
             try {
                 GameInformation info = new GameInformation(new ArrayList<>(gameInformation.getPlayers().stream().filter(player -> player.getId() != clientId).toList()));
                 if(info.getPlayers().size() > 0) {
-                    System.out.println("Send gameInfo to " + clientName);
+                    /*System.out.println("Send gameInfo to " + clientName);
                     for(Player player : info.getPlayers()){
                         System.out.println(player.getId() + ": " + player.getPos().x + " " + player.getPos().y);
-                    }
+                    }*/
                     outputStream.writeObject(new Message("gameInformation", info));
                 }
             } catch (IOException e){

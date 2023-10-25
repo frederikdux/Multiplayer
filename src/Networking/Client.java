@@ -25,7 +25,7 @@ public class Client {
     public Client(GameManager manager) {
         this.manager = manager;
         try {
-            socket = new Socket("25.37.137.22", 12345);
+            socket = new Socket("localhost", 12345);
 
             if(socket.isConnected()) {
                 System.out.println("Verbindung zum Server hergestellt.");
@@ -49,7 +49,7 @@ public class Client {
                     ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
                     Message message;
                     while ((message = (Message) in.readObject()) != null && this.socket.isConnected()) {
-                        System.out.println("Received data of Type: " + message.messageType);
+                        //System.out.println("Received data of Type: " + message.messageType);
 
                         switch(message.messageType){
                             case "gameInformation":

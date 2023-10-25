@@ -1,8 +1,10 @@
 package Entity;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 public class Player implements Serializable {
+    @Serial
     private static final long serialVersionUID = 6529685098267757690L;
 
     private Integer id;

@@ -2,13 +2,15 @@ package Entity;
 
 import Entity.Vector2f;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Optional;
 
 public class GameInformation implements Serializable {
-    private static final long serialVersionUID = 6529685098267757693L;
+    @Serial
+    private static final long serialVersionUID = 6529685098267757690L;
 
     private ArrayList<Player> players = new ArrayList<Player>();
     private HashMap<Integer, Vector2f> playerPositions;

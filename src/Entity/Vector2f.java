@@ -1,9 +1,11 @@
 package Entity;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 public class Vector2f implements Serializable {
-    private static final long serialVersionUID = 6529685098267757697L;
+    @Serial
+    private static final long serialVersionUID = 6529685098267757690L;
 
     public float x;
     public float y;

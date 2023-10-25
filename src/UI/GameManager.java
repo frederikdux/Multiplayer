@@ -16,9 +16,9 @@ public class GameManager {
     public final HashMap<Integer, Vector2f> enemysLastPositions = new HashMap<>();
     public final HashMap<Integer, Vector2f> enemysVelocity = new HashMap<>();
 
-    Long lastUpdate = 0L;
-    Long newUpdate = 0L;
-    long elapsedTimeMilli = 0;
+    long lastUpdate = 0;
+    long newUpdate = 0;
+    long elapsedTime = 0;
 
     private Client client;
 
@@ -53,33 +53,38 @@ public class GameManager {
     }
 
     public void calculateVelocity(int id, Vector2f pos){
-        newUpdate = System.nanoTime();
-        elapsedTimeMilli = (newUpdate - lastUpdate) / 1000000;
-        lastUpdate = newUpdate;
-        float elapsedTime = ((float)elapsedTimeMilli) / 100;
-        System.out.println(elapsedTime);
+        if(enemysLastPositions.containsKey(id)) {
+            newUpdate = System.nanoTime();
+            elapsedTime = (newUpdate - lastUpdate) / 1000;
+            lastUpdate = newUpdate;
+            float elapsedTimeSec = ((float) elapsedTime) / 100000;
+            System.out.println(elapsedTimeSec);
 
 
-        Vector2f lastPosition = enemysLastPositions.get(id);
-        Vector2f velocity = new Vector2f((pos.x - lastPosition.x) * elapsedTime, (pos.y - lastPosition.y) * elapsedTime);
-        enemysVelocity.replace(id, velocity);
-        System.out.println("Velocity: " + velocity.x + " " + velocity.y);
-        enemysLastPositions.replace(id, pos);
+            Vector2f lastPosition = enemysLastPositions.get(id);
+            Vector2f velocity = new Vector2f((pos.x - lastPosition.x) * elapsedTimeSec, (pos.y - lastPosition.y) * elapsedTimeSec);
+            enemysVelocity.replace(id, velocity);
+            System.out.println("Velocity: " + velocity.x + " " + velocity.y);
+            enemysLastPositions.replace(id, pos);
+        }
+        else{
+            enemysLastPositions.put(id, pos);
+        }
     }
 
     public void updateEnemies(){
         newUpdate = System.nanoTime();
-        elapsedTimeMilli = (newUpdate - lastUpdate) / 1000000;
+        elapsedTime = (newUpdate - lastUpdate) / 1000;
         lastUpdate = newUpdate;
-        float elapsedTime = ((float)elapsedTimeMilli) / 100;
-        System.out.println(elapsedTime);
+        float elapsedTimeSec = ((float)elapsedTime) / 100000;
+        System.out.println(elapsedTimeSec);
 
         for (Player newEnemy: client.receivedGameInformations.getPlayers()){
             if(enemies.stream().anyMatch(enemy -> enemy.id == newEnemy.getId())){
                 enemies.stream().forEach(enemy -> {
                     if(enemy.id == newEnemy.getId()){
                         Vector2f lastPosition = enemysLastPositions.get(enemy.id);
-                        Vector2f velocity = new Vector2f((newEnemy.getPos().x - lastPosition.x) * elapsedTime, (newEnemy.getPos().y - lastPosition.y) * elapsedTime);
+                        Vector2f velocity = new Vector2f((newEnemy.getPos().x - lastPosition.x) * elapsedTimeSec, (newEnemy.getPos().y - lastPosition.y) * elapsedTimeSec);
                         enemysVelocity.replace(enemy.id, velocity);
                         System.out.println("Velocity: " + velocity.x + " " + velocity.y);
                         enemy.setPos(newEnemy.getPos());

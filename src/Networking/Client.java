@@ -48,7 +48,7 @@ public class Client {
                 try {
                     ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
                     Message message;
-                    while ((message = (Message) in.readObject()) != null) {
+                    while ((message = (Message) in.readObject()) != null && this.socket.isConnected()) {
                         System.out.println("Received data of Type: " + message.messageType);
 
                         switch(message.messageType){

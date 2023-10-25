@@ -47,10 +47,30 @@ public class GameManager {
     }
 
 
+    public void gameUpdate(){
+        for (Enemy enemy : enemies){
+        }
+    }
+
+    public void calculateVelocity(int id, Vector2f pos){
+        newUpdate = System.nanoTime();
+        elapsedTimeMilli = (newUpdate - lastUpdate) / 1000000;
+        lastUpdate = newUpdate;
+        float elapsedTime = ((float)elapsedTimeMilli) / 100;
+        System.out.println(elapsedTime);
+
+
+        Vector2f lastPosition = enemysLastPositions.get(id);
+        Vector2f velocity = new Vector2f((pos.x - lastPosition.x) * elapsedTime, (pos.y - lastPosition.y) * elapsedTime);
+        enemysVelocity.replace(id, velocity);
+        System.out.println("Velocity: " + velocity.x + " " + velocity.y);
+        enemysLastPositions.replace(id, pos);
+    }
 
     public void updateEnemies(){
         newUpdate = System.nanoTime();
-        elapsedTimeMilli = (newUpdate - lastUpdate)/1000000;
+        elapsedTimeMilli = (newUpdate - lastUpdate) / 1000000;
+        lastUpdate = newUpdate;
         float elapsedTime = ((float)elapsedTimeMilli) / 100;
         System.out.println(elapsedTime);
 

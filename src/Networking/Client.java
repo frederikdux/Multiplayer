@@ -82,7 +82,10 @@ public class Client {
             manager.registerNewEnemy(player);
         }
         else{
-            manager.enemies.stream().filter(enemy -> enemy.id == player.getId()).forEach(enemy -> enemy.setPos(player.getPos()));
+            manager.enemies.stream().filter(enemy -> enemy.id == player.getId()).forEach(enemy -> {
+                enemy.setPos(player.getPos());
+                manager.calculateVelocity(enemy.id, enemy.getPos());
+            });
         }
     }
 

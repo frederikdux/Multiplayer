@@ -3,6 +3,8 @@ package Entity;
 import java.io.Serializable;
 
 public class Player implements Serializable {
+    private static final long serialVersionUID = 6529685098267757690L;
+
     private Integer id;
     private Vector2f pos;
     private Vector2f rot;

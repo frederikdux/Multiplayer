@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.Optional;
 
 public class GameInformation implements Serializable {
+    private static final long serialVersionUID = 6529685098267757693L;
+
     private ArrayList<Player> players = new ArrayList<Player>();
     private HashMap<Integer, Vector2f> playerPositions;
     private HashMap<Integer, Vector2f> playerRotations;

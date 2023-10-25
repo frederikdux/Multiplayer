@@ -3,6 +3,8 @@ package Entity;
 import java.io.Serializable;
 
 public class Vector2f implements Serializable {
+    private static final long serialVersionUID = 6529685098267757697L;
+
     public float x;
     public float y;
 

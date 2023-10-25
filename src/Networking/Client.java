@@ -23,7 +23,7 @@ public class Client {
     public Client(GameManager manager) {
         this.manager = manager;
         try {
-            socket = new Socket("localhost", 12345);
+            socket = new Socket("25.37.95.70", 12345);
             System.out.println("Verbindung zum Server hergestellt.");
 
             Scanner scanner = new Scanner(System.in);

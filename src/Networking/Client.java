@@ -5,6 +5,7 @@ import UI.GameManager;
 
 import java.io.*;
 import java.net.*;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Client {
@@ -40,29 +41,20 @@ public class Client {
                     ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
                     Message message;
                     while ((message = (Message) in.readObject()) != null) {
+                        System.out.println("Received data of Type: " + message.messageType);
 
-                        if(message.messageType.equals("gameInformation")){
-                            receivedGameInformations = (GameInformation) message.message;
-                            System.out.println(receivedGameInformations.getPlayers().size());
-                            manager.updateEnemies();
-                        }
-
-
-
-                        if(message.messageType.equals("playerData")){
-                            Player player = (Player) message.message;
-                            if(manager.enemies.stream().noneMatch(enemy -> player.getId() == enemy.id)) {
-                                System.out.println("Neuer Gegner registriert");
-                                manager.registerNewEnemy(player);
-                            }
-                            else{
-                                manager.enemies.stream().filter(enemy -> enemy.id == player.getId()).forEach(enemy -> enemy.setPos(player.getPos()));
-                            }
-                        }
-
-
-                        if(message.messageType.equals("String")){
-                            System.out.println(((TextMessage) message.message).text);
+                        switch(message.messageType){
+                            case "gameInformation":
+                                extractGameInformation(manager, message);
+                                break;
+                            case "playerData":
+                                extractPlayerData(manager, message);
+                                break;
+                            case "String":
+                                System.out.println(((TextMessage)message.message).text);
+                                break;
+                            default:
+                                extractCustomMessage(message);
                         }
                     }
                 } catch (IOException | ClassNotFoundException e) {
@@ -70,14 +62,42 @@ public class Client {
                 }
             });
             receiveThread.start();
-
-            // Benutzereingabe und Senden an den Server
-            String userInput;
-
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
+
+    private void extractPlayerData(GameManager manager, Message message) {
+        Player player = (Player) message.message;
+        if(manager.enemies.stream().noneMatch(enemy -> player.getId() == enemy.id)) {
+            System.out.println("Neuer Gegner registriert");
+            manager.registerNewEnemy(player);
+        }
+        else{
+            manager.enemies.stream().filter(enemy -> enemy.id == player.getId()).forEach(enemy -> enemy.setPos(player.getPos()));
+        }
+    }
+
+    private void extractGameInformation(GameManager manager, Message message) {
+        receivedGameInformations = (GameInformation)message.message;
+        manager.updateEnemies();
+    }
+
+
+    private void extractCustomMessage(Message message){
+        switch (message.messageType){
+            case "playerEvent":
+                PlayerEvent playerEvent = (PlayerEvent) message.message;
+                switch (playerEvent.event){
+                    case "playerLeftServer":
+                        manager.logoutEnemy(playerEvent.player.getId());
+                        break;
+                }
+                break;
+        }
+    }
+
+
     public void sendPlayerInformation(Player player){
         try {
             output.writeObject(new Message("playerData", player));

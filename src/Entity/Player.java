@@ -34,6 +34,7 @@ public class Player implements Serializable {
         this.pos = player.getPos();
         this.rot = player.getRot();
         this.id = id;
+        this.clientName = player.getClientName();
     }
 
     public Player(String clientName, Vector2f pos, Vector2f rot){

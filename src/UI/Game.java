@@ -76,12 +76,12 @@ public class Game extends JFrame implements KeyListener {
 
     public void paintComponent(Graphics g){
         g.setColor(Color.green);
-        g.fillOval((int) manager.player.getPos().y, (int) manager.player.getPos().x, 20, 20);
+        g.fillOval((int) manager.player.getPos().x, (int) manager.player.getPos().y, 20, 20);
 
         g.setColor(Color.RED);
         try {
             for (Enemy enemy : manager.enemies) {
-                g.fillRect((int) enemy.getPos().y, (int) enemy.getPos().x, 20, 20);
+                g.fillRect((int) enemy.getPos().x, (int) enemy.getPos().y, 20, 20);
                 g.drawString(enemy.getClientName(), (int)enemy.getPos().x, (int)enemy.getPos().y);
             }
         } catch (ConcurrentModificationException e){
@@ -99,27 +99,27 @@ public class Game extends JFrame implements KeyListener {
     @Override
     public void keyPressed(KeyEvent e) {
         keys.replace(e.getKeyCode(), true);
-        controllPlayer(e.getKeyChar());
+        controllPlayer();
     }
 
     @Override
     public void keyReleased(KeyEvent e) {
         keys.replace(e.getKeyCode(), false);
+        controllPlayer();
     }
 
-    public void controllPlayer(char pressed){
+    public void controllPlayer(){
         for (Map.Entry<Integer, Boolean> entry : keys.entrySet()){
             if(entry.getValue()) {
                 switch (entry.getKey()) {
-                    case KeyEvent.VK_W -> manager.player.move(new Vector2f(-2, 0));
-                    case KeyEvent.VK_A -> manager.player.move(new Vector2f(0, -2));
-                    case KeyEvent.VK_S -> manager.player.move(new Vector2f(2, 0));
-                    case KeyEvent.VK_D -> manager.player.move(new Vector2f(0, 2));
+                    case KeyEvent.VK_W -> manager.player.move(new Vector2f(0, -2));
+                    case KeyEvent.VK_A -> manager.player.move(new Vector2f(-2, 0));
+                    case KeyEvent.VK_S -> manager.player.move(new Vector2f(0, 2));
+                    case KeyEvent.VK_D -> manager.player.move(new Vector2f(2, 0));
                 }
+                manager.getClient().sendPlayerInformation(new Player(new Vector2f(manager.player.getPos().x, manager.player.getPos().y), manager.player.getRot()));
             }
         }
-        manager.getClient().sendPlayerInformation(new Player(new Vector2f(manager.player.getPos().x, manager.player.getPos().y), manager.player.getRot()));
-
     }
 
 }

@@ -10,17 +10,9 @@ public class Enemy {
         this.pos = pos;
         this.rot = rot;
         this.clientName = clientName;
-    }
-    public Enemy(Integer id, Vector2f pos, Vector2f rot){
         this.id = id;
-        this.pos = pos;
-        this.rot = rot;
     }
-    public Enemy(Integer id, String clientName, Vector2f pos, Vector2f rot){
-        this.id = id;
-        this.pos = pos;
-        this.rot = rot;
-    }
+
 
     public Vector2f getPos() {
         return pos;

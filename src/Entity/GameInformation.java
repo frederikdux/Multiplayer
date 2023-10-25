@@ -43,6 +43,10 @@ public class GameInformation implements Serializable {
         playerRotations.remove(id);
     }
 
+    public void removePlayerByID(int id){
+        players.removeIf(player -> player.getId() == id);
+    }
+
 
 
 

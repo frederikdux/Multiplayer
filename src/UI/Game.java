@@ -85,6 +85,9 @@ public class Game extends JFrame implements KeyListener {
     }
 
     public void paintComponent(Graphics g){
+        if(manager.getClient() != null) {
+            setTitle(manager.getClient().currentServerInformation);
+        }
         g.setColor(Color.green);
         g.fillOval((int) manager.player.getPos().x, (int) manager.player.getPos().y, 20, 20);
 

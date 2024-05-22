@@ -27,69 +27,13 @@ public class Client {
 
 
     List<ServerData> serverDataList = new ArrayList<>();
+
+    public String currentServerInformation;
     public Client(GameManager manager) {
         scanner = new Scanner(System.in);
         this.manager = manager;
 
         receiveServerList();
-
-        System.out.println("Läd Server-List...");
-        while(serverDataList.isEmpty()){
-            System.out.println("");
-        }
-
-        int counter = 0;
-        System.out.println("Server-List:\n");
-        for (ServerData serverData : serverDataList) {
-            System.out.println(counter + ": " + serverData.getServerName() + "  Adress: " + serverData.getAddr());
-        }
-        System.out.println("Welchem Server joinen?");
-
-
-        int joinServerNumber = Integer.parseInt(scanner.nextLine());
-        try {
-            System.out.println(serverDataList.get(joinServerNumber).getAddr());
-            socket = new Socket(serverDataList.get(joinServerNumber).getAddr(), 12342);
-
-            if(socket.isConnected()) {
-                System.out.println("Verbindung zum Server hergestellt.");
-            }
-            else{
-                System.out.println("Verbindung fehlgeschlagen!");
-            }
-
-            output = new ObjectOutputStream(socket.getOutputStream());
-            output.writeObject(new Message("registerNewPlayer", new Player(clientName, manager.player)));
-
-
-            // Thread zum Empfangen von Nachrichten vom Server
-            Thread receiveThread = new Thread(() -> {
-                try {
-                    ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
-                    Message message;
-                    while ((message = (Message) in.readObject()) != null && this.socket.isConnected()) {
-                        System.out.println("Received data of Type: " + message.messageType);
-
-                        switch(message.messageType){
-                            case "gameInformation":
-                                extractGameInformation(manager, message);
-                                break;
-                            case "playerData":
-                                extractPlayerData(manager, message);
-                                break;
-                            case "String":
-                                System.out.println(((TextMessage)message.message).text);
-                                break;
-                        }
-                    }
-                } catch (IOException | ClassNotFoundException e) {
-                    e.printStackTrace();
-                }
-            });
-            receiveThread.start();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     private void extractPlayerData(GameManager manager, Message message) {
@@ -174,6 +118,7 @@ public class Client {
             output = new ObjectOutputStream(dServerSocket.getOutputStream());
             output.writeObject(new Message("receiveServerList", "null"));
 
+            System.out.println("Läd Server-List...");
 
             // Thread zum Empfangen von Nachrichten vom Server
             Thread receiveThread = new Thread(() -> {
@@ -193,6 +138,7 @@ public class Client {
                             default:
                                 extractCustomMessage(message);
                         }
+                        joinServer();
                     }
                 } catch (IOException | ClassNotFoundException e) {
                     e.printStackTrace();
@@ -202,6 +148,63 @@ public class Client {
         } catch (IOException e) {
             System.out.println("Es ist ein Fehler aufgetreten!");
             e.printStackTrace();;
+        }
+    }
+
+    public void joinServer(){
+        int counter = 0;
+        System.out.println("Server-List:");
+        for (ServerData serverData : serverDataList) {
+            System.out.println(counter + ": " + serverData.getServerName() + "  Adress: " + serverData.getAddr());
+            counter++;
+        }
+        System.out.println("\nWelchem Server joinen?");
+
+
+        int joinServerNumber = Integer.parseInt(scanner.nextLine());
+        try {
+            System.out.println(serverDataList.get(joinServerNumber).getAddr());
+            socket = new Socket(serverDataList.get(joinServerNumber).getAddr(), 12345);
+
+            if(socket.isConnected()) {
+                System.out.println("Verbindung zum Server hergestellt.");
+                currentServerInformation = serverDataList.get(joinServerNumber).getServerName() + " - " + serverDataList.get(joinServerNumber).getAddr();
+            }
+            else{
+                System.out.println("Verbindung fehlgeschlagen!");
+            }
+
+            output = new ObjectOutputStream(socket.getOutputStream());
+            output.writeObject(new Message("registerNewPlayer", new Player(clientName, manager.player)));
+
+
+            // Thread zum Empfangen von Nachrichten vom Server
+            Thread receiveThread = new Thread(() -> {
+                try {
+                    ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
+                    Message message;
+                    while ((message = (Message) in.readObject()) != null && this.socket.isConnected()) {
+                        System.out.println("Received data of Type: " + message.messageType);
+
+                        switch(message.messageType){
+                            case "gameInformation":
+                                extractGameInformation(manager, message);
+                                break;
+                            case "playerData":
+                                extractPlayerData(manager, message);
+                                break;
+                            case "String":
+                                System.out.println(((TextMessage)message.message).text);
+                                break;
+                        }
+                    }
+                } catch (IOException | ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
+            });
+            receiveThread.start();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }

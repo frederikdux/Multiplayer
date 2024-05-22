@@ -1,14 +1,12 @@
 package Networking;
 
 import Entity.*;
+import Other.Constants;
 
 import java.io.*;
 import java.lang.reflect.Array;
 import java.net.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Server {
@@ -20,7 +18,36 @@ public class Server {
 
     public GameInformation gameInformation = new GameInformation();
 
+    Socket distributionServerSocket;
+    ObjectOutputStream output;
+    ServerData serverData;
+
     public Server(){
+        //Clientverhalten zum DistributionServer
+        try {
+            distributionServerSocket = new Socket(Constants.localIpAdress, 23232);
+            serverData = new ServerData("", Constants.localIpAdress, 12345);
+
+            if (distributionServerSocket.isConnected()) {
+                System.out.println("Verbindung zum Server hergestellt.");
+            } else {
+                System.out.println("Verbindung fehlgeschlagen!");
+            }
+
+            Scanner scanner = new Scanner(System.in);
+
+            System.out.print("Gib deinen Namen ein: ");
+            serverData.setServerName(scanner.nextLine());
+
+            output = new ObjectOutputStream(distributionServerSocket.getOutputStream());
+            output.writeObject(new Message("registerNewServer", serverData));
+
+        } catch (Exception e) {
+
+        }
+
+
+            //Serververhalten
         try {
             ServerSocket serverSocket = new ServerSocket(12345);
             System.out.println("Server gestartet. Warte auf Verbindungen...");
@@ -118,12 +145,12 @@ public class Server {
 
         private void extractVector2f(Message message) {
             Vector2f pos = ((Vector2f) message.message);
-            System.out.println(clientName + ": " + pos.x + " / " + pos.y);
+            //System.out.println(clientName + ": " + pos.x + " / " + pos.y);
         }
 
         private void extractPlayerData(Message message) {
             Player receivedPlayer = ((Player) message.message);
-            System.out.println(clientName + ": " + receivedPlayer.getPos().x + " / " + receivedPlayer.getPos().y);
+            //System.out.println(clientName + ": " + receivedPlayer.getPos().x + " / " + receivedPlayer.getPos().y);
             server.gameInformation.updatePlayer(clientId, receivedPlayer);
             broadcastPlayerData(new Player(clientId, receivedPlayer));
         }
@@ -133,8 +160,10 @@ public class Server {
             Vector2f pos;
             for(int i = 0; i < server.gameInformation.getPlayerPositions().size(); i++){
                 pos = server.gameInformation.getPlayerPositions().get(i);
-                System.out.println(clientName + ": " + pos.x + " / " + pos.y);
+                //System.out.println(clientName + ": " + pos.x + " / " + pos.y);
             }
+
+            System.out.println("received GameInformation");
         }
 
 

@@ -23,6 +23,16 @@ public class ServerData implements Serializable {
         this.port = port;
     }
 
+    public ServerData(Integer id, String serverName, String addr, int port) {
+        this.id = id;
+        this.serverName = serverName;
+        this.addr = addr;
+        this.port = port;
+    }
+
+    public ServerData() {
+    }
+
     public String getServerName() {
         return serverName;
     }
@@ -45,5 +55,13 @@ public class ServerData implements Serializable {
 
     public void setPort(int port) {
         this.port = port;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 }

@@ -13,10 +13,7 @@ import java.util.stream.Collectors;
 
 public class DistributionServer {
     private static List<ObjectOutputStream> outputStreams = new ArrayList<>();
-    private static Map<ObjectOutputStream, String> serverNames = new HashMap<>();
-    private static Map<ObjectOutputStream, Integer> serverIDs = new HashMap<>();
-
-    private static Map<ObjectOutputStream, String> serverIPs = new HashMap<>();
+    private static Map<ObjectOutputStream, ServerData> serverDataMap = new HashMap<>();
 
     private static int counter = 0;
 
@@ -44,7 +41,7 @@ public class DistributionServer {
         private Socket socket;
         private ObjectOutputStream out;
         private ObjectInputStream in;
-        private String serverName = null;
+        private ServerData serverData = new ServerData();
         private Integer serverId = null;
         private DistributionServer distributionServer;
 
@@ -87,24 +84,20 @@ public class DistributionServer {
         }
 
         private void extractRegisterNewServerRequest(Message message) {
-            if (serverName == null) {
-                ServerData newServer = ((ServerData) message.message);
-                serverId = counter++;
+            if (serverData.getServerName() == null) {
+                serverData = ((ServerData) message.message);
+                serverData.setId(counter++);
                 outputStreams.add(out);
-                serverName = newServer.getServerName() + "#" + serverId;
-                serverNames.put(out, serverName);
-                serverIDs.put(out, serverId);
-                serverIPs.put(out, socket.getInetAddress().getHostAddress());
-                System.out.println(serverName + " ist nun als Server registriert.");
+                serverDataMap.put(out, serverData);
+                System.out.println(serverData.getAddr() + " ist nun als Server registriert.");
             }
         }
 
 
         private void logoutServer() {
             outputStreams.remove(out);
-            serverNames.remove(out);
-            serverIDs.remove(out);
-            System.out.println(serverName + " hat sich als Server abgemeldet.");
+            serverDataMap.remove(out);
+            System.out.println(serverData.getServerName() + " hat sich als Server abgemeldet.");
         }
 
 
@@ -115,8 +108,8 @@ public class DistributionServer {
             try {
                 List<ServerData> serverDataList = new ArrayList<>();
                 for (OutputStream outputStream : outputStreams) {
-                    serverDataList.add(new ServerData(serverNames.get(outputStream), serverIPs.get(outputStream), 23232));
-                    System.out.println(serverNames.get(outputStream) + "  " + serverIPs.get(outputStream));
+                    serverDataList.add(serverDataMap.get(outputStream));
+                    System.out.println(serverDataMap.get(outputStream).getAddr() + "  " + serverDataMap.get(outputStream).getAddr());
                 }
                 out.writeObject(new Message("serverList", new ServerListDTO(serverDataList)));
 

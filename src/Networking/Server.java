@@ -26,7 +26,6 @@ public class Server {
         //Clientverhalten zum DistributionServer
         try {
             distributionServerSocket = new Socket(Constants.localIpAdress, 23232);
-            serverData = new ServerData("", Constants.localIpAdress, 12345);
 
             if (distributionServerSocket.isConnected()) {
                 System.out.println("Verbindung zum Server hergestellt.");
@@ -36,8 +35,14 @@ public class Server {
 
             Scanner scanner = new Scanner(System.in);
 
-            System.out.print("Gib deinen Namen ein: ");
-            serverData.setServerName(scanner.nextLine());
+            System.out.print("Welchen Namen soll der Server haben? ");
+            String serverName = scanner.nextLine();
+            System.out.println("Über welchen Port ist der Server erreichbar?");
+            int serverPort = Integer.parseInt(scanner.nextLine());
+
+            serverData = new ServerData(serverName, Constants.localIpAdress, serverPort);
+
+            System.out.println(serverData.getServerName());
 
             output = new ObjectOutputStream(distributionServerSocket.getOutputStream());
             output.writeObject(new Message("registerNewServer", serverData));
@@ -49,7 +54,7 @@ public class Server {
 
             //Serververhalten
         try {
-            ServerSocket serverSocket = new ServerSocket(12345);
+            ServerSocket serverSocket = new ServerSocket(serverData.getPort());
             System.out.println("Server gestartet. Warte auf Verbindungen...");
 
             while (true) {

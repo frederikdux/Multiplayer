@@ -15,6 +15,7 @@ public class Client {
     PrintWriter writer;
 
     ObjectOutputStream output;
+    ObjectInputStream in;
 
     Socket dServerSocket;
     Socket socket;
@@ -123,7 +124,7 @@ public class Client {
             // Thread zum Empfangen von Nachrichten vom Server
             Thread receiveThread = new Thread(() -> {
                 try {
-                    ObjectInputStream in = new ObjectInputStream(dServerSocket.getInputStream());
+                    in = new ObjectInputStream(dServerSocket.getInputStream());
                     Message message;
                     while ((message = (Message) in.readObject()) != null && this.dServerSocket.isConnected()) {
                         System.out.println("Received data of Type: " + message.messageType);
@@ -153,18 +154,18 @@ public class Client {
 
     public void joinServer(){
         int counter = 0;
-        System.out.println("Server-List:");
+        System.out.println("\n\nServer-List:");
         for (ServerData serverData : serverDataList) {
             System.out.println(counter + ": " + serverData.getServerName() + "  Adress: " + serverData.getAddr());
             counter++;
         }
-        System.out.println("\nWelchem Server joinen?");
+        System.out.println("Welchem Server joinen?");
 
 
         int joinServerNumber = Integer.parseInt(scanner.nextLine());
         try {
             System.out.println(serverDataList.get(joinServerNumber).getAddr());
-            socket = new Socket(serverDataList.get(joinServerNumber).getAddr(), 12345);
+            socket = new Socket(serverDataList.get(joinServerNumber).getAddr(), serverDataList.get(joinServerNumber).getPort());
 
             if(socket.isConnected()) {
                 System.out.println("Verbindung zum Server hergestellt.");
@@ -181,11 +182,9 @@ public class Client {
             // Thread zum Empfangen von Nachrichten vom Server
             Thread receiveThread = new Thread(() -> {
                 try {
-                    ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
+                    in = new ObjectInputStream(socket.getInputStream());
                     Message message;
                     while ((message = (Message) in.readObject()) != null && this.socket.isConnected()) {
-                        System.out.println("Received data of Type: " + message.messageType);
-
                         switch(message.messageType){
                             case "gameInformation":
                                 extractGameInformation(manager, message);
